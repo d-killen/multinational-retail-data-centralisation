@@ -1,14 +1,40 @@
 
 from dateutil.parser import parse
-
 import pandas as pd
+
+#Disable Chained Assigment warning in Pandas
 pd.options.mode.chained_assignment = None  # default='warn'
 
 class DataCleaning:
-#This class will contain methods to clean data from each of the data sources
+    """Class to clean data from various sources
 
+    Methods
+        clean_user_data(user_df):
+            Cleans the user data dataframe
+        clean_card_data(card_df):
+            Cleans the card data dataframe
+        clean_store_data(store_df):
+            Cleans the store data dataframe
+        convert_product_weights(product_df):
+            Converts all weights to kg in the product data dataframe
+        clean_products_data(products_df):
+            Cleans the product data dataframe
+        clean_orders_data(orders_df):
+            Cleans the orders data dataframe
+        clean_date_time_data(date_time_df):
+            Cleans the date/time data dataframe
+    """   
     def clean_user_data(self, user_df):
-               
+        """Cleans the user data dataframe
+
+        Parameters
+            user_df : dataframe
+                Dataframe of raw user data
+
+        Returns
+            clean_user_df : dataframe
+                Dataframe of clean user data
+        """       
         allowed_countries = ['Germany', 'United Kingdom', 'United States']
         country_mask = user_df['country'].isin(allowed_countries)
         user_df = user_df[country_mask]
@@ -30,9 +56,21 @@ class DataCleaning:
         #correct index
         user_df.reset_index(drop=True, inplace=True)
 
-        return user_df
+        clean_user_df = user_df
+        return clean_user_df
     
     def clean_card_data(self, card_df):
+        """Cleans the card data dataframe
+
+        Parameters
+            card_df : dataframe
+                Dataframe of raw card data
+
+        Returns
+            clean_card_df : dataframe
+                Dataframe of clean card data
+        """   
+
         # cardnumbers should only have numbers
         card_df['card_number'] = card_df['card_number'].astype(str)
         card_df['card_number'] = card_df['card_number'].str.replace('?', '', regex=False)
@@ -51,9 +89,20 @@ class DataCleaning:
         # correct index
         card_df.reset_index(drop=True, inplace=True)
 
-        return card_df
+        clean_card_df = card_df
+        return clean_card_df
     
     def clean_store_data(self, store_df):
+        """Cleans the store data dataframe
+
+        Parameters
+            store_df : dataframe
+                Dataframe of raw store data
+
+        Returns
+            clean_store_df : dataframe
+                Dataframe of clean store data
+        """ 
         #correct country codes
         allowed_country_code = ['DE', 'GB', 'US']
         country_code_mask = store_df['country_code'].isin(allowed_country_code)
@@ -75,15 +124,31 @@ class DataCleaning:
         #correct index
         store_df.reset_index(drop=True, inplace=True)
 
-        return store_df
+        clean_store_df = store_df
+        return clean_store_df
     
     def convert_product_weights(self, product_df):
-        #this will take the products DataFrame as an argument and return the products DataFrame
-        #Convert them all to a decimal value representing their weight in kg. Use a 1:1 ratio 
-        # of ml to g as a rough estimate for the rows containing ml.
-        #Develop the method to clean up the weight column and remove all excess characters then 
-        # represent the weights as a float.
+        """Converts all weights to kg in the product data dataframe
+
+        Parameters
+            product_df : dataframe
+                Dataframe of raw product data
+
+        Returns
+            converted_product_df : dataframe
+                Dataframe of product data with weights all in kg
+        """
         def multipack_string_to_weight(string):
+            """Converts weights of multipack items
+
+            Parameters
+                string : string
+                    String of multipack item count and weight eg "5 x 15g"
+
+            Returns
+                value : float
+                    Weight of multipack item eg "75"
+            """
             list=string.split(sep=' ')
             value = float(list[0])*float(list[2])
             return value
@@ -142,13 +207,21 @@ class DataCleaning:
         frames = [kg_df, g_df, multi_df, ml_df, oz_df, ig_df]
         product_df = pd.concat(frames)
 
-        return product_df
+        converted_product_df = product_df
+        return converted_product_df
     
     def clean_products_data(self, products_df):
-        #drop coloumn unnamed 0
-        #products_df.drop('Unnamed: 0', axis=1, inplace=True)
+        """Cleans the product data dataframe
 
-        #correct removed
+        Parameters
+            products_df : dataframe
+                Dataframe of raw product data
+
+        Returns
+            clean_products_df : dataframe
+                Dataframe of clean product data
+        """ 
+        #correct removed column
         products_df['removed']=products_df['removed'].str.replace('Still_avaliable', 'Still_available', regex=False)
         allowed_removed = ['Still_available', 'Removed']
         removed_mask = products_df['removed'].isin(allowed_removed)
@@ -168,19 +241,20 @@ class DataCleaning:
         #correct index
         products_df.reset_index(drop=True, inplace=True)
 
+        clean_products_df = products_df
         return products_df
     
     def clean_orders_data(self, orders_df):
-        #You should remove the columns, first_name, last_name and 1 to have 
-        # the table in the correct form before uploading to the database.
-        #You will see that the orders data contains column headers which are 
-        # the same in other tables.
-        #This table will act as the source of truth for your sales data and 
-        # will be at the center of your star based database schema.
+        """Cleans the order data dataframe
 
-        #drop coloumn "level_0"
-        #orders_df.drop('level_0', axis=1, inplace=True)
+        Parameters
+            orders_df : dataframe
+                Dataframe of raw order data
 
+        Returns
+            clean_orders_df : dataframe
+                Dataframe of clean order data
+        """
         #drop coloumn "1"
         orders_df.drop('1', axis=1, inplace=True)
         orders_df.drop('first_name', axis=1, inplace=True)
@@ -190,24 +264,28 @@ class DataCleaning:
 
         #correct index
         orders_df.reset_index(drop=True, inplace=True)
-
-        return orders_df
+        
+        clean_orders_df = orders_df
+        return clean_orders_df
     
     def clean_date_time_data(self, date_time_df):
+        """Cleans the date/time data dataframe
+
+        Parameters
+            date_time_df : dataframe
+                Dataframe of raw date/time data
+
+        Returns
+            clean_date_time_df : dataframe
+                Dataframe of clean date/time data
+        """
         #remove NULLs and Errors
         allowed_time_period = ['Evening', 'Morning', 'Midday', 'Late_Hours']
         time_period_mask = date_time_df['time_period'].isin(allowed_time_period)
         date_time_df = date_time_df[time_period_mask]
 
-        # #check unique values in time period
-        # print(date_time_df['time_period'].unique())
-        # print(date_time_df['month'].unique())
-        # print(date_time_df['year'].unique())
-        # print(date_time_df['day'].unique())
-
-        #generate date column?
-
         #correct index
         date_time_df.reset_index(drop=True, inplace=True)
 
-        return date_time_df
+        clean_date_time_df = date_time_df
+        return clean_date_time_df
