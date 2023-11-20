@@ -11,6 +11,7 @@ import data_extraction
 import data_cleaning
 import re
 
+
 dbc = database_utils.DatabaseConnector()
 de = data_extraction.DataExtractor()
 dc = data_cleaning.DataCleaning()

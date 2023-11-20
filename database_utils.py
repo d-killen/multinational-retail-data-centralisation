@@ -1,6 +1,7 @@
 from sqlalchemy import create_engine, inspect
 import yaml
 
+
 class DatabaseConnector:
     """Class to connect to databases
 

@@ -3,6 +3,7 @@ import pandas as pd
 import requests
 import tabula
 
+
 class DataExtractor:
     """Class to extract company data from various sources
 
