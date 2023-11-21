@@ -1,4 +1,4 @@
-# Mulinational Retail Data Centralisation
+# Multinational Retail Data Centralisation
 
 ## Contents
 
@@ -31,7 +31,7 @@ Learning achieved through this project includes:
 
 ## Installation Instructions
 
-1. Download the Mulinational Retail Data Centralisation project directory
+1. Download the Multinational Retail Data Centralisation project directory
 1. Create the necessary PostgreSQL database named sales_data 
 1. Create a local YAML file named db_creds.yaml and locate it in the project directory and within it enter the following data:
 
@@ -64,7 +64,7 @@ NOTE: Running the milestones.py file twice will produce an error without first r
 
 ## License Information
 
-Mulinational Retail Data Centralisation
+Multinational Retail Data Centralisation
 Copyright (C) 2023 Daniel Killen
 
 This program is free software; you can redistribute it and/or modify
