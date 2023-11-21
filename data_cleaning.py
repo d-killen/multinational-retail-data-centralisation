@@ -34,26 +34,28 @@ class DataCleaning:
         Returns
             clean_user_df : dataframe
                 Dataframe of clean user data
-        """       
+        """
+        # FIlter countries      
         allowed_countries = ['Germany', 'United Kingdom', 'United States']
         country_mask = user_df['country'].isin(allowed_countries)
         user_df = user_df[country_mask]
 
+        # Filter country codes
         allowed_country_code = ['DE', 'GB', 'US', 'GGB']
         country_code_mask = user_df['country_code'].isin(allowed_country_code)
         user_df = user_df[country_code_mask]
         user_df['country_code'] = user_df['country_code'].str.replace('GGB', 'GB', regex=False)
 
-        #remove NULLs
+        # Remove NULLs
         user_df.dropna(inplace=True)
 
+        # Format dates
         user_df['date_of_birth'] = user_df['date_of_birth'].apply(parse)
         user_df.date_of_birth = pd.to_datetime(user_df.date_of_birth, errors='coerce')
-
         user_df['join_date'] = user_df['join_date'].apply(parse)
         user_df.join_date = pd.to_datetime(user_df.join_date, errors='coerce')
 
-        #correct index
+        # Correct index
         user_df.reset_index(drop=True, inplace=True)
 
         clean_user_df = user_df
@@ -70,23 +72,22 @@ class DataCleaning:
             clean_card_df : dataframe
                 Dataframe of clean card data
         """   
-
-        # cardnumbers should only have numbers
+        # Cardnumbers should only have numbers
         card_df['card_number'] = card_df['card_number'].astype(str)
         card_df['card_number'] = card_df['card_number'].str.replace('?', '', regex=False)
         
-        # expiry_date should be XX/XX
+        # Expiry_date should be XX/XX
         expiry_mask=card_df.expiry_date.str.contains('/')
         card_df=card_df[expiry_mask]
 
-        # remove NULLs
+        # Remove NULLs
         card_df.dropna(inplace=True)
         
-        # format dates
+        # Format dates
         card_df['date_payment_confirmed'] = card_df['date_payment_confirmed'].apply(parse)
         card_df.date_payment_confirmed = pd.to_datetime(card_df.date_payment_confirmed, errors='coerce')
 
-        # correct index
+        # Correct index
         card_df.reset_index(drop=True, inplace=True)
 
         clean_card_df = card_df
@@ -103,25 +104,25 @@ class DataCleaning:
             clean_store_df : dataframe
                 Dataframe of clean store data
         """ 
-        #correct country codes
+        # Correct country codes
         allowed_country_code = ['DE', 'GB', 'US']
         country_code_mask = store_df['country_code'].isin(allowed_country_code)
         store_df = store_df[country_code_mask]
 
-        #format dates
+        # Format dates
         store_df['opening_date'] = store_df['opening_date'].apply(parse)
         store_df.opening_date = pd.to_datetime(store_df.opening_date, errors='coerce')
 
-        #correct head count
+        # Correct head count
         store_df['staff_numbers'] = store_df['staff_numbers'].astype(str)
         regex_hc = "[^0-9]"
         store_df['staff_numbers'] = store_df['staff_numbers'].str.replace(regex_hc, '', regex=True)
         store_df['staff_numbers'] = pd.to_numeric(store_df.staff_numbers, errors='coerce')
 
-        #correct continent
+        # Correct continent
         store_df['continent']=store_df['continent'].str.replace('ee', '', regex=False)
 
-        #correct index
+        # Correct index
         store_df.reset_index(drop=True, inplace=True)
 
         clean_store_df = store_df
@@ -155,55 +156,55 @@ class DataCleaning:
 
         product_df['weight']=product_df['weight'].astype(str)
 
-        #values with kg
+        # Sort values with kg
         kg_mask = product_df.weight.str.endswith('kg')
         kg_df = product_df[kg_mask]
-        #remove kg
+        # Remove kg
         kg_df['weight'] = kg_df['weight'].str.strip('kg')
         kg_df['weight'] = kg_df['weight'].astype(float)
 
-        #values with g
+        # Sort values with g
         g_mask = (product_df.weight.str.endswith('g')) & (product_df['weight'].str[-2] != 'k') & (~product_df.weight.str.contains('x'))
         g_df = product_df[g_mask]
-        #remove g and convert to kg
+        # Remove g and convert to kg
         g_df['weight'] = g_df['weight'].str.strip('g')
         g_df['weight'] = g_df['weight'].astype(float)
         g_df['weight'] = g_df['weight']/1000
 
-        #multipack items
+        # Multipack items
         multi_mask = product_df.weight.str.contains('x')
         multi_df = product_df[multi_mask]
-        #remove g and multiply, convert to kg
+        # Remove g and multiply, convert to kg
         multi_df['weight'] = multi_df['weight'].str.strip('g')
         multi_df['weight'] = multi_df['weight'].apply(multipack_string_to_weight)
         multi_df['weight'] = multi_df['weight'].astype(float)
         multi_df['weight'] = multi_df['weight']/1000
         
-        #values with ml
+        # Sort values with ml
         ml_mask = product_df.weight.str.endswith('ml')
         ml_df = product_df[ml_mask]
-        #remove 'ml' and convert to kg
+        # Remove 'ml' and convert to kg
         ml_df['weight'] = ml_df['weight'].str.strip('ml')
         ml_df['weight'] = ml_df['weight'].astype(float)
         ml_df['weight'] = ml_df['weight']/1000
 
-        #values with oz
+        # Sort values with oz
         oz_mask = (product_df.weight.str.endswith('oz'))
         oz_df = product_df[oz_mask]
-        #remove 'oz' and convert to kg
+        # Remove 'oz' and convert to kg
         oz_df['weight'] = oz_df['weight'].str.strip('oz')
         oz_df['weight'] = oz_df['weight'].astype(float)
         oz_df['weight'] = oz_df['weight']*0.0283495
 
-        #incorrect g values
+        # Sort for incorrect g values
         ig_mask = (product_df.weight.str.endswith('g .'))
         ig_df = product_df[ig_mask]
-        #remove 'oz' and convert to kg
+        # Remove 'g' and convert to kg
         ig_df['weight'] = ig_df['weight'].str.strip('g .')
         ig_df['weight'] = ig_df['weight'].astype(float)
         ig_df['weight'] = ig_df['weight']/1000
         
-        #concat frames
+        # Concat frames
         frames = [kg_df, g_df, multi_df, ml_df, oz_df, ig_df]
         product_df = pd.concat(frames)
 
@@ -221,28 +222,28 @@ class DataCleaning:
             clean_products_df : dataframe
                 Dataframe of clean product data
         """ 
-        #correct removed column
+        # Correct removed column
         products_df['removed']=products_df['removed'].str.replace('Still_avaliable', 'Still_available', regex=False)
         allowed_removed = ['Still_available', 'Removed']
         removed_mask = products_df['removed'].isin(allowed_removed)
         products_df = products_df[removed_mask]
 
-        #convert price to float
+        # Convert price to float
         products_df['product_price']=products_df['product_price'].str.replace('£', '', regex=False)
         products_df['product_price'] = pd.to_numeric(products_df.product_price, errors='coerce')
 
-        #correct dates
+        # Correct dates
         products_df['date_added'] = products_df['date_added'].apply(parse)
         products_df.date_added = pd.to_datetime(products_df.date_added, errors='coerce')
 
-        #correct ean case
+        # Correct ean case
         products_df.rename(columns={"EAN":"ean"}, inplace=True)
 
-        #correct index
+        # Correct index
         products_df.reset_index(drop=True, inplace=True)
 
         clean_products_df = products_df
-        return products_df
+        return clean_products_df
     
     def clean_orders_data(self, orders_df):
         """Cleans the order data dataframe
@@ -255,14 +256,13 @@ class DataCleaning:
             clean_orders_df : dataframe
                 Dataframe of clean order data
         """
-        #drop coloumn "1"
+        # Drop column "1"
         orders_df.drop('1', axis=1, inplace=True)
         orders_df.drop('first_name', axis=1, inplace=True)
         orders_df.drop('last_name', axis=1, inplace=True)
-
         orders_df['card_number'] = orders_df['card_number'].astype(str)
 
-        #correct index
+        # Correct index
         orders_df.reset_index(drop=True, inplace=True)
         
         clean_orders_df = orders_df
@@ -279,12 +279,12 @@ class DataCleaning:
             clean_date_time_df : dataframe
                 Dataframe of clean date/time data
         """
-        #remove NULLs and Errors
+        # Remove NULLs and Errors
         allowed_time_period = ['Evening', 'Morning', 'Midday', 'Late_Hours']
         time_period_mask = date_time_df['time_period'].isin(allowed_time_period)
         date_time_df = date_time_df[time_period_mask]
 
-        #correct index
+        # Correct index
         date_time_df.reset_index(drop=True, inplace=True)
 
         clean_date_time_df = date_time_df
