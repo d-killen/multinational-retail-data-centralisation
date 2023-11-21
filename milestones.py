@@ -66,7 +66,7 @@ def milestone_3():   # TODO: Consider use of functions to streamline
     
     # Create metadata object
     metadata = MetaData()
-    
+
     # Milestone 3 Task 1: Cast columns of orders_table to correct data types
     table_name = 'orders_table'
     print(f"***\nUpdating details for {table_name}:")
@@ -627,6 +627,8 @@ def sql_col_cast(engine, table_name, column_name, new_data_type):
         new_data_type : str
             Name of desired datatype
     """
+    # Create metadata object
+    metadata = MetaData()
     # Reflect the existing table with the engine passed
     metadata.reflect(bind=engine, only=[table_name])
 
