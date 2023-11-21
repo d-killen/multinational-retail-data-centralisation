@@ -63,6 +63,10 @@ def milestone_2():
 # Milestone 3 objectives grouped within a function:
 def milestone_3():   # TODO: Consider use of functions to streamline
     # Milestone 3 requires modifications to the sales_data database:
+    
+    # Create metadata object
+    metadata = MetaData()
+    
     # Milestone 3 Task 1: Cast columns of orders_table to correct data types
     table_name = 'orders_table'
     print(f"***\nUpdating details for {table_name}:")
@@ -680,9 +684,6 @@ dc = data_cleaning.DataCleaning()
 
 # Create the SQL connection engine
 engine = dbc.init_db_engine("sales_data")
-
-# Create metadata object
-metadata = MetaData()
 
 # Milestone 1: Create Git Repository
 # Milestone 2: Extract clean and upload data to sales_data:
